@@ -24,6 +24,12 @@ SKENARET = {
         ("WALKING", 3), ("SITTING", 7), ("STANDING", 3),
         ("WALKING_UPSTAIRS", 2), ("SITTING", 4),
     ],
+    "Pushim i mirë çdo orë": [
+        ("SITTING", 4), ("WALKING", 3), ("SITTING", 4), ("WALKING", 3),
+    ],
+    "Mbrëmje e qetë në shtëpi": [
+        ("STANDING", 3), ("SITTING", 5), ("LAYING", 6),
+    ],
 }
 
 st.set_page_config(page_title="Forge", layout="centered")
@@ -95,9 +101,15 @@ if "parashikimet" in st.session_state:
             jo_ulur += 1
             if jo_ulur >= 2:
                 radhazi = 0
-        if radhazi >= kufiri and keshilla_ne is None:
+        keshille = radhazi >= kufiri
+        if keshille and keshilla_ne is None:
             keshilla_ne = i
-        rreshtat.append({"Matja": i, "Aktiviteti": EMRAT[p], "Ulur radhazi": radhazi})
+        rreshtat.append({
+            "Matja": i,
+            "Aktiviteti": EMRAT[p],
+            "Ulur radhazi": radhazi,
+            "Këshillë": "Po" if keshille else "",
+        })
 
     e_fundit = parashikimet[-1]
     st.markdown(
@@ -109,10 +121,12 @@ if "parashikimet" in st.session_state:
 
     st.write(f"**Ulur pa u ngritur:** {radhazi} nga {kufiri} matje")
     st.progress(min(radhazi / kufiri, 1.0))
-    if keshilla_ne:
+    if radhazi >= kufiri:
         st.warning("Ke qëndruar ulur shumë. Ngrihu pak!")
+    elif keshilla_ne:
+        st.info(f"Këshilla u dha në matjen {keshilla_ne}. Pastaj u ngrite, shumë mirë!")
     else:
-        st.success("Gjithçka në rregull, vazhdo kështu.")
+        st.success("Nuk u arrit kufiri i uljes. Vazhdo kështu!")
 
     st.subheader(f'A po bën vërtet "{EMRAT[e_fundit]}"?')
     k1, k2 = st.columns(2)
